@@ -12,9 +12,14 @@ def setup(driver):
 #Search for a specific address and verify map zooms in & marker points to the right location
 def test_search_city_and_verify_zoom(driver, setup):
     page = setup
+    
+    # calculating the lan/lon/zoom coordinates before making any action in the map & will be compared with 
+    # lan/lon/coordinates after that action
     before_lat, before_lon, before_zoom = page.parse_lat_lon_from_url()
+    
     page.search_location("528 Pontius Ave N")
     time.sleep(2)
+    
     after_lat, after_lon, after_zoom = page.parse_lat_lon_from_url()
 
     assert after_zoom and (after_zoom > before_zoom or after_zoom > 5), "Map did not zoom in"
