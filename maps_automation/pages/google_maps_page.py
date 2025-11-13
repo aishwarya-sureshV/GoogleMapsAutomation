@@ -29,11 +29,11 @@ class GoogleMapsPage:
         JSWaiter.wait_for_url_change(self.driver, self.driver.current_url)
         JSWaiter.wait_for_ready_state(self.driver)
 
+    # this function is used to read the current lan/lon/zoom level from the url
     def parse_lat_lon_from_url(self):
-        """Waits until Google Maps URL contains lat/lon/zoom pattern and returns them gracefully."""
         pattern = re.compile(r"@(-?\d+\.\d+),(-?\d+\.\d+),(\d+)z")
-
         try:
+            # Waits until Google Maps URL contains lat/lon/zoom pattern and returns them gracefully.
             WebDriverWait(self.driver, 10).until(lambda d: pattern.search(d.current_url))
             url = self.driver.current_url
             match = pattern.search(url)
@@ -51,6 +51,7 @@ class GoogleMapsPage:
             return None, None, None
 
     def zoom_in(self):
+        # sometimes direct click() won't work, hence using wait functions to ensure it is clickable
         self.wait.until(EC.element_to_be_clickable(self.ZOOM_IN_BTN)).click()
 
     def zoom_out(self):
