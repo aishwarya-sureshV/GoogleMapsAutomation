@@ -12,6 +12,7 @@ class GoogleMapsPage:
     ZOOM_OUT_BTN = (By.CSS_SELECTOR, "button[aria-label='Zoom out']")
     INFO_PANEL = (By.CSS_SELECTOR, "div[role='region']")
     CANVAS = (By.CSS_SELECTOR, "canvas")
+    SEARCH_SUGGESTIONS = (By.CSS_SELECTOR, "div[aria-label='Suggestions'] div")
 
     def __init__(self, driver):
         self.driver = driver
@@ -21,11 +22,21 @@ class GoogleMapsPage:
         self.driver.get(url)
         JSWaiter.wait_for_ready_state(self.driver)
 
-    def search_location(self, location_name):
+    def search_location(self, location_name, enter = True):
         search_box = self.wait.until(EC.presence_of_element_located(self.SEARCH_BOX))
         search_box.clear()
         search_box.send_keys(location_name)
-        search_box.send_keys(Keys.ENTER)
+        if enter:
+            search_box.send_keys(Keys.ENTER)
+            self.wait_for_page_loading(self.driver)
+
+    def collect_suggestions_list(self):
+        suggestions = WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_all_elements_located(self.SEARCH_SUGGESTIONS)
+        )
+        return suggestions
+
+    def wait_for_page_loading(self, driver):
         JSWaiter.wait_for_url_change(self.driver, self.driver.current_url)
         JSWaiter.wait_for_ready_state(self.driver)
 
@@ -51,7 +62,7 @@ class GoogleMapsPage:
             return None, None, None
 
     def zoom_in(self):
-        # sometimes direct click() won't work, hence using wait functions to ensure it is clickable
+        #sometimes direct click() won't work, hence using wait functions to ensure it is clickable
         self.wait.until(EC.element_to_be_clickable(self.ZOOM_IN_BTN)).click()
 
     def zoom_out(self):
